@@ -29,12 +29,12 @@ class TemperatureDisplay:
         self.__sense = SenseHat()
         self.__cold, self.__hot = load_config()
 
-    def _run(self):
+    def run(self):
         while self._running:
             self.display_temperature()
             sleep(10)
 
-    def _terminate(self):
+    def terminate(self):
         self._running = False
 
     def display_temperature(self):
