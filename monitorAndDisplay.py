@@ -55,9 +55,3 @@ class TemperatureDisplay:
             colour = (0, 255, 0)
         temp_msg = '{: .0f}C'.format(self.__sense.get_temperature())
         self.__sense.show_message(temp_msg, text_colour=colour)
-
-#
-# display = TemperatureDisplay()
-# while True:
-#     display.display_temperature()
-#     sleep(10)

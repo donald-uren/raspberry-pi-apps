@@ -1,11 +1,12 @@
 from threading import Thread
 from monitorAndDisplay import TemperatureDisplay
-import time
+
+display = TemperatureDisplay()
+display_thread = Thread(target=display.run)
+display_thread.start()
 
 stop = None
-display = TemperatureDisplay()
-display_thread = Thread(target=display.run())
 while stop != "stop":
-    stop = input("enter \'stop\' to halt program")
-display.terminate()
+    stop = input("enter \'stop\' to halt program.\n")
 
+display.terminate()
