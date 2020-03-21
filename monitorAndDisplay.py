@@ -25,7 +25,17 @@ class TemperatureDisplay:
         TODO: add cold/hot values upon init?
         - static for class? all objects need the same, maybe outside of init?
         """
+        self._running = True
         self.__sense = SenseHat()
+        self.__cold, self.__hot = load_config()
+
+    def _run(self):
+        while self._running:
+            self.display_temperature()
+            sleep(10)
+
+    def _terminate(self):
+        self._running = False
 
     def display_temperature(self):
         """
@@ -35,19 +45,19 @@ class TemperatureDisplay:
         TODO: put colours somewhere else? less hard-coded?
         :return:
         """
-        cold, hot = load_config()
+
         temp = self.__sense.get_temperature()
-        if temp <= cold:
+        if temp <= self.__cold:
             colour = (0, 0, 255)
-        elif temp >= hot:
+        elif temp >= self.__hot:
             colour = (255, 0, 0)
         else:
             colour = (0, 255, 0)
         temp_msg = '{: .0f}C'.format(self.__sense.get_temperature())
         self.__sense.show_message(temp_msg, text_colour=colour)
 
-
-display = TemperatureDisplay()
-while True:
-    display.display_temperature()
-    sleep(10)
+#
+# display = TemperatureDisplay()
+# while True:
+#     display.display_temperature()
+#     sleep(10)
