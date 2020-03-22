@@ -12,22 +12,34 @@ from time import sleep
 import json
 
 
-def load_config():
-    with open("config.json", "r") as fp:
-        data = json.load(fp)
-    return data["cold_max"], data["hot_min"]
-
-
 class TemperatureDisplay:
-    # create static range variables?
-    def __init__(self):
+    """
+    Issue with senseHAT reading incorrect value (similar cases reported online)
+    - rough adjustment to more closely align to correct temperature value
+    """
+    __adjustment = -5
+    red = (255, 0, 0)
+    green = (0, 255, 0)
+    blue = (0, 0, 255)
+
+    def __init__(self, file_path):
         """
-        TODO: add cold/hot values upon init?
-        - static for class? all objects need the same, maybe outside of init?
+        Initialise object using file_path for range (hot/cold) values
         """
         self._running = True
         self.__sense = SenseHat()
-        self.__cold, self.__hot = load_config()
+        self.__cold, self.__hot = self.load_config(file_path)
+
+    @staticmethod
+    def load_config(file_path):
+        """
+        load range (hot/cold) values
+        :param file_path: path of config.json file
+        :return: hot/cold values
+        """
+        with open(file_path, "r") as fp:
+            data = json.load(fp)
+        return data["cold_max"], data["hot_min"]
 
     def run(self):
         while self._running:
@@ -39,19 +51,13 @@ class TemperatureDisplay:
 
     def display_temperature(self):
         """
+        Takes current temperature and displays in correct colour based on hot/cold range values
         NOTE: SenseHAT is consistently incorrect (overestimates temp), others have documented similar issues online
         Testing code in a SenseHAT emulator results in the correct output
-        TODO: this method runs every 10s, grab current temp and display
         TODO: put colours somewhere else? less hard-coded?
         :return:
         """
-
-        temp = self.__sense.get_temperature()
-        if temp <= self.__cold:
-            colour = (0, 0, 255)
-        elif temp >= self.__hot:
-            colour = (255, 0, 0)
-        else:
-            colour = (0, 255, 0)
+        temp = self.__sense.get_temperature() + self.__adjustment
+        colour = self.blue if temp <= self.__cold else (self.red if temp >= self.__hot else self.green)
         temp_msg = '{: .0f}C'.format(self.__sense.get_temperature())
         self.__sense.show_message(temp_msg, text_colour=colour)
