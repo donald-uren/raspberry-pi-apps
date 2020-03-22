@@ -59,5 +59,5 @@ class TemperatureDisplay:
         """
         temp = self.__sense.get_temperature() + self.__adjustment
         colour = self.blue if temp <= self.__cold else (self.red if temp >= self.__hot else self.green)
-        temp_msg = '{: .0f}C'.format(self.__sense.get_temperature())
+        temp_msg = '{: .0f}C'.format(temp)
         self.__sense.show_message(temp_msg, text_colour=colour)
