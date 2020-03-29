@@ -1,44 +1,55 @@
-from electronicDie import ElectronicDie
+from electronicDie import ElectronicDice
 from datetime import datetime
-from sense_emu import SenseHat
+from sense_hat import SenseHat
+from time import sleep
 import csv
 
 class Game:        
     def __init__(self, name1, name2):
         self.sense = SenseHat()
-        self.die = ElectronicDie()
+        self.dice = ElectronicDice()
         self.player1 = self.Player(name1)
         self.player2 = self.Player(name2)
 
     def run(self):
         self.display_message('instruction')
         while (self.player1.score < 30 and self.player2.score < 30):
-            self.display_message("Player 1's turn")
-            score = self.die.roll()
+            self.display_message("player 1 roll")
+            score = self.dice.roll()
             self.player1.update_score(score)
             if self.player1.score >= 30:
                 self.write_winner(self.player1)
-                self.display_message('player 1 win')
+                self.display_message('player 1 wins')
                 break
-            self.display_message("Player 2's turn")
-            score = self.die.roll()
+            self.display_message("player 2 roll")
+            score = self.dice.roll()
             self.player2.update_score(score)
             if self.player2.score >= 30:
                 self.write_winner(self.player2)
-                self.display_message('player 2 win')
+                self.display_message('player 2 wins')
                 break
 
     def display_message(self, message):
         if message == 'instruction':
-            self.sense.show_message('game')
-        elif message == 'player 1 win':
-            self.sense.show_message('Player 1 win')
-        elif message == 'player 2 win':
-            self.sense.show_message('Player 2 win')
+            content = "Players take turn rolling the dice, who gets 30 points first win the game"
+            print(content)
+            self.sense.show_message(content, scroll_speed=0.05)
+        elif message == 'player 1 wins':
+            content = self.player1.name + ' wins'
+            print(content)
+            self.sense.show_message(content, scroll_speed=0.05)
+        elif message == 'player 2 wins':
+            content = self.player2.name + ' wins'
+            print(content)
+            self.sense.show_message(content, scroll_speed=0.05)
         elif message == 'player 1 roll':
-            self.sense.show_message("Player 1's turn")
+            content = self.player1.name + "'s turn"
+            print(content)
+            self.sense.show_message(content, scroll_speed=0.05)
         elif message == 'player 2 roll':
-            self.sense.show_message("Player 2's turn")
+            content = self.player2.name + "'s turn"
+            print(content)
+            self.sense.show_message(content, scroll_speed=0.05)
 
     def write_winner(self, player):
         with open('Desktop/winner.csv', mode='a') as winner_file:
@@ -53,7 +64,6 @@ class Game:
 
         def update_score(self, score: int) -> int:
             self.score += score
-            return score
+            print(self.name + "'s score: " + str(self.score))
+            return self.score
 
-game = Game('John', 'Mike')
-game.run()
