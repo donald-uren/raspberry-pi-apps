@@ -52,7 +52,7 @@ class Game:
             self.sense.show_message(content, scroll_speed=0.05)
 
     def write_winner(self, player):
-        with open('Desktop/winner.csv', mode='a') as winner_file:
+        with open('winner.csv', mode='a') as winner_file:
             winner_writer = csv.writer(winner_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             
             winner_writer.writerow([datetime.now(), player.name, player.score])
