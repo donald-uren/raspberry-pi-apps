@@ -1,16 +1,18 @@
 from electronicDie import ElectronicDice
 from datetime import datetime
 from sense_hat import SenseHat
-from time import sleep
 import csv
 
-class Game:        
+
+# Game object
+class Game:
     def __init__(self, name1, name2):
         self.sense = SenseHat()
         self.dice = ElectronicDice()
         self.player1 = self.Player(name1)
         self.player2 = self.Player(name2)
 
+    # Run the game
     def run(self):
         self.display_message('instruction')
         while (self.player1.score < 30 and self.player2.score < 30):
@@ -29,9 +31,11 @@ class Game:
                 self.display_message('player 2 wins')
                 break
 
+    # Display instruction at the start of the game
     def display_message(self, message):
         if message == 'instruction':
-            content = "Players take turn rolling the dice, who gets 30 points first win the game"
+            content = '''Players take turn rolling the dice, who gets 30
+             points first win the game'''
             print(content)
             self.sense.show_message(content, scroll_speed=0.05)
         elif message == 'player 1 wins':
@@ -51,22 +55,27 @@ class Game:
             print(content)
             self.sense.show_message(content, scroll_speed=0.05)
 
+    # Write winner and their score to the csv file with a timestamp
     def write_winner(self, player):
         try:
             with open('Desktop/winner.csv', mode='a') as winner_file:
-                winner_writer = csv.writer(winner_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                
-                winner_writer.writerow([datetime.now(), player.name, player.score])
+                winner_writer = csv.writer(
+                    winner_file, delimiter=',', quotechar='"',
+                    quoting=csv.QUOTE_MINIMAL)
+
+                winner_writer.writerow(
+                    [datetime.now(), player.name, player.score])
         except IOError:
             print('Fail to open file')
 
+    # Player object has a name and a score
     class Player:
         def __init__(self, name):
             self.name = name
             self.score = 0
 
+        # update_score method add dice result to player score
         def update_score(self, score: int) -> int:
             self.score += score
             print(self.name + "'s score: " + str(self.score))
             return self.score
-
