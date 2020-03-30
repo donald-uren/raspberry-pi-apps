@@ -57,6 +57,7 @@ class Game:
 
     # Write winner and their score to the csv file with a timestamp
     def write_winner(self, player):
+<<<<<<< HEAD
         try:
             with open('Desktop/winner.csv', mode='a') as winner_file:
                 winner_writer = csv.writer(
@@ -67,6 +68,12 @@ class Game:
                     [datetime.now(), player.name, player.score])
         except IOError:
             print('Fail to open file')
+=======
+        with open('winner.csv', mode='a') as winner_file:
+            winner_writer = csv.writer(winner_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            
+            winner_writer.writerow([datetime.now(), player.name, player.score])
+>>>>>>> 98df3e98b1247d8ebf60751a4c4a3989e9ac3f38
 
     # Player object has a name and a score
     class Player:
