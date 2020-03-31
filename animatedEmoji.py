@@ -12,7 +12,7 @@ class EmojiDisplay:
     @staticmethod
     def create_shapes():
         """
-        hard coded pattern creation function
+        hard coded pattern creation function, used as a fallback if json file is not specified
         can specify a file path for config.json
         :return:
         """
@@ -66,14 +66,33 @@ class EmojiDisplay:
 
 class JSONLoader:
     @staticmethod
-    def load_from_json(file_name):
+    def load_from_json(file_name, sense=None):
+        """
+        Attempts to load patterns and colours from specified json file
+        Ensures format and values inside json file are correct
+            e.g. pattern values are within range of colours
+        :param file_name: config.json file to load from
+        :param sense: SenseHat for optional error message display
+        :return:
+        """
         try:
             with open(file_name, "r") as fp:
                 config = json.load(fp)
             colours = config["colours"]
             patterns = config["patterns"]
-            coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
+            p_min, p_max = 0, 0
+            for i in range(0, len(patterns)):
+                p_min = min(patterns[i]) if p_min > min(patterns[i]) else p_min
+                p_max = max(patterns[i]) if p_max < max(patterns[i]) else p_max
+            if p_min < 0:
+                raise ValueError("Error in {}. patterns contain values < 0", file_name)
+            elif p_max >= len(colours):
+                raise ValueError("Error in {}. patterns exceed colour range", file_name)
+            else:
+                coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
         except FileNotFoundError or KeyError or IndexError or ValueError as e:
+            if sense is not None:
+                sense.show_message("Error in loading json file", scroll_speed=0.04)
             print(str(e))
             sys.exit()
         else:
