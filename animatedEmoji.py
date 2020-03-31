@@ -1,13 +1,21 @@
-from typing import List
+import json
+import sys
 from sense_hat import SenseHat
 from time import sleep
 
 
 class EmojiDisplay:
-    def __init__(self):
+    def __init__(self, file_name=None):
         self.__sense = SenseHat()
+        self._patterns = EmojiDisplay.create_shapes() if file_name is None else JSONLoader.load_from_json(file_name)
 
-    def create_shapes(self):
+    @staticmethod
+    def create_shapes():
+        """
+        hard coded pattern creation function
+        can specify a file path for config.json
+        :return:
+        """
         olive = (0, 143, 0)
         pale = (255, 252, 121)
         l_blue = (4, 51, 255)
@@ -50,31 +58,23 @@ class EmojiDisplay:
         return patterns
 
     def display_emoji(self):
-        patterns = self.create_shapes()
-        for emoji in patterns:
+        for emoji in self._patterns:
             self.__sense.set_pixels(emoji)
             sleep(3)
         self.__sense.clear()
 
 
-display = EmojiDisplay()
-display.display_emoji()
-
-#
-# [[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],
-#  [79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],
-#  [255,252,121],[255,252,121],[1,25,147],[4,51,255],[255,252,121],[1,25,147],[4,51,255],[255,252,121],
-#  [255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],
-#  [255,252,121],[255,38,0],[255,38,0],[255,38,0],[255,252,121],[255,252,121],[255,252,121],[255,252,121],
-#  [255,252,121],[255,38,0],[0,0,0],[255,38,0],[255,252,121],[255,252,121],[255,252,121],[255,252,121],
-#  [255,252,121],[255,38,0],[255,38,0],[255,38,0],[255,252,121],[255,252,121],[255,252,121],[255,252,121],
-#  [255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121]]
-#
-# [[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],[79,143,0],
-#  [79,143,0],[79,143,0],[255,252,121],[255,252,121],[79,143,0],[255,252,121],[79,143,0],[79,143,0],
-#  [79,143,0],[4,51,255],[1,25,147],[255,252,121],[4,51,255],[1,25,147],[255,252,121],[79,143,0],
-#  [255,252,121],[255,255,255],[255,255,255],[255,252,121],[255,255,255],[255,255,255],[255,252,121],[255,252,121],
-#  [255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],[255,252,121],
-#  [255,252,121],[255,252,121],[255,38,0],[255,38,0],[255,38,0],[255,38,0],[255,252,121],[255,252,121],
-#  [255,252,121],[255,38,0],[0,0,0],[255,255,255],[255,255,255],[0,0,0],[255,38,0],[255,252,121],
-#  [255,252,121],[255,38,0],[255,38,0],[255,38,0],[255,38,0],[255,38,0],[255,38,0],[255,252,121]]
+class JSONLoader:
+    @staticmethod
+    def load_from_json(file_name):
+        try:
+            with open(file_name, "r") as fp:
+                config = json.load(fp)
+            colours = config["colours"]
+            patterns = config["patterns"]
+            coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
+        except FileNotFoundError or KeyError or IndexError or ValueError as e:
+            print(str(e))
+            sys.exit()
+        else:
+            return coloured_patterns
