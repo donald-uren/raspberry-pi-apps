@@ -8,6 +8,9 @@ from sensehat_calibration import CalibratedSenseHat
 
 # noinspection PyMethodMayBeStatic
 class VirtualSenseHat:
+    """
+    Minor change to original code - returns CalibratedSenseHat() which enables more accurate temperature readings.
+    """
     @staticmethod
     def getSenseHat(logError=True):
         try:
@@ -27,8 +30,11 @@ class VirtualSenseHat:
     def get_humidity(self, min=5000, max=6000):
         return random.randint(min, max) / 100
 
-    def show_message(self, text_string,
-                     scroll_speed=0.1, text_colour=[255, 255, 255], back_colour=[0, 0, 0]):
+    def show_message(self, text_string, scroll_speed=0.1, text_colour=None, back_colour=None):
+        if back_colour is None:
+            back_colour = [0, 0, 0]
+        if text_colour is None:
+            text_colour = [255, 255, 255]
         print(text_string)
 
     def clear(self, colour=(0, 0, 0)):

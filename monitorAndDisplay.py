@@ -1,10 +1,3 @@
-"""
-display and monitor temperature:
-- update every 10s
-- blue if <= cold_max
-- red if >= hot_min
-- else green
-"""
 from virtual_sense_hat import VirtualSenseHat
 from time import sleep
 import sys
@@ -13,8 +6,11 @@ import json
 
 class TemperatureDisplay:
     """
-    Issue with senseHAT reading incorrect value (similar cases reported online)
-    - rough adjustment to more closely align to correct temperature value
+    Displays and monitors current temperature:
+    - updates every 10s
+    - display blue if <= cold_max
+    - display red if >= hot_min
+    - else display green
     """
     red = (255, 0, 0)
     green = (0, 255, 0)
@@ -22,27 +18,16 @@ class TemperatureDisplay:
 
     def __init__(self, file_path):
         """
-        Initialise object using file_path for range (hot/cold) values
+        Initialise object, loads range values from configuration, and SenseHat (if available)
+        :param file_path: config.json file path
         """
         self._running = True
         self._sense = VirtualSenseHat.getSenseHat()
-        # self._sense = VirtualSenseHat.getVirtualSenseHat()
         self._hot, self._cold = JSONLoader.load_config(file_path, self._sense)
-
-    # @staticmethod
-    # def load_config(file_path):
-    #     """
-    #     load range (hot/cold) values
-    #     :param file_path: path of config.json file
-    #     :return: hot/cold values
-    #     """
-    #     with open(file_path, "r") as fp:
-    #         data = json.load(fp)
-    #     return data["cold_max"], data["hot_min"]
 
     def run(self):
         """
-        :return:
+        Records current temperature and runs temperature display
         """
         while self._running:
             temp = self._sense.get_temperature()
@@ -50,31 +35,35 @@ class TemperatureDisplay:
             sleep(10)
 
     def terminate(self):
+        """
+        Terminates programming by setting loop condition to false and clearing the display
+        """
         self._sense.clear()
         self._running = False
 
     def display_temperature(self, temp):
         """
-        Takes current temperature and displays in correct colour based on hot/cold range values
-        NOTE: SenseHAT is consistently incorrect (overestimates temp), others have documented similar issues online
-        Testing code in a SenseHAT emulator results in the correct output
-        added self.__adjustment value to attempt to correct reading (wip)
-        :param temp: current temperature reading from CalibratedSenseHat [see get_temperature()]
-        :return: None
+        Takes current temperature and displays in correct colour based on hot/cold range values.
+
+        NOTE: the SenseHat I've been working with doesn't detect the correct temperature. I've applied and modified
+        the calibration code from PIOT_LECTURE4_CODEARCHIVE however it's still off by roughly 2C.
+
+        :param temp: current temperature reading from CalibratedSenseHat [see CalibratedSenseHat.get_temperature()]
         """
         colour = self.blue if temp <= self._cold else (self.red if temp >= self._hot else self.green)
-        # if temp <= self._cold:
-        #     colour = self.blue
-        # elif temp >= self._hot:
-        #     colour = self.red
-        # else:
-        #     colour = self.green
         self._sense.clear(colour)
         # print temperature value to console for verification
         print("{: .1f}C".format(temp))
 
 
 class JSONLoader:
+    """
+    Expected configuration of config.json file is:
+        cold_max: x,
+        hot_min: y
+    where x < y
+    - only two range values are required i.e. comfortable range can be assumed from maximum of cold and minimum of hot
+    """
     @staticmethod
     def load_config(file_path, sense):
         """
