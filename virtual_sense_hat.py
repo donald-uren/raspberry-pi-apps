@@ -17,6 +17,10 @@ class VirtualSenseHat:
                 logging.error("Falling back to VirtualSenseHat because: " + str(e))
             return VirtualSenseHat()
 
+    @staticmethod
+    def getVirtualSenseHat():
+        return VirtualSenseHat()
+
     def get_temperature(self, min=1000, max=3000):
         return random.randint(min, max) / 100
 
@@ -27,5 +31,5 @@ class VirtualSenseHat:
                      scroll_speed=0.1, text_colour=[255, 255, 255], back_colour=[0, 0, 0]):
         print(text_string)
 
-    def clear(self):
-        pass
+    def clear(self, colour=(0, 0, 0)):
+        print(colour)

@@ -8,12 +8,12 @@ class CalibratedSenseHat(SenseHat):
         super().__init__()
 
     def get_temperature(self):
-        t_cpu = get_cpu_temp()
+        temp_cpu = get_cpu_temp()
         # Calculates the real temperature compensating CPU heating.
-        t = (self.get_temperature_from_humidity() + self.get_temperature_from_humidity()) / 2
-        t_corr = t - ((t_cpu - t) / 1.5)
-        t_corr = get_smooth(t_corr)
-        return t_corr
+        temp_avg = (self.get_temperature_from_humidity() + self.get_temperature_from_humidity()) / 2
+        calibrated = temp_avg - ((temp_cpu - temp_avg) / 1.2)
+        calibrated = get_smooth(calibrated)
+        return calibrated
 
 
 # Get CPU temperature.

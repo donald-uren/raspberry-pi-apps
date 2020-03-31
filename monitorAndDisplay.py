@@ -26,6 +26,7 @@ class TemperatureDisplay:
         """
         self._running = True
         self._sense = VirtualSenseHat.getSenseHat()
+        # self._sense = VirtualSenseHat.getVirtualSenseHat()
         self._hot, self._cold = JSONLoader.load_config(file_path, self._sense)
 
     # @staticmethod
@@ -49,6 +50,7 @@ class TemperatureDisplay:
             sleep(10)
 
     def terminate(self):
+        self._sense.clear()
         self._running = False
 
     def display_temperature(self, temp):
@@ -84,8 +86,8 @@ class JSONLoader:
         try:
             with open(file_path, "r") as fp:
                 data = json.load(fp)
-            hot = data["cold_max"]
-            cold = data["hot_min"]
+            cold = data["cold_max"]
+            hot = data["hot_min"]
             if hot < cold:
                 raise ValueError("Hot cannot be less than cold value")
         except FileNotFoundError as fnfe:
