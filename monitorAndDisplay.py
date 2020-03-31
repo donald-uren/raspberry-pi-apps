@@ -4,24 +4,18 @@ display and monitor temperature:
 - blue if <= cold_max
 - red if >= hot_min
 - else green
-TODO: sep class/file for json handling?
-TODO: separate display and reading from sense/writing to sense
 """
-from sense_hat import SenseHat
+from virtual_sense_hat import VirtualSenseHat
 from time import sleep
-from threading import Thread
+import sys
 import json
 
 
 class TemperatureDisplay:
     """
-    TODO: display constantly, 10s is for reading temp > refactor function to display/functional separation
-    TODO: ORRRR even easier is to just show a solid colour. no threads.
-    TODO: ADD CLIBRATION CODE FROM LECTURE
     Issue with senseHAT reading incorrect value (similar cases reported online)
     - rough adjustment to more closely align to correct temperature value
     """
-    __adjustment = -5
     red = (255, 0, 0)
     green = (0, 255, 0)
     blue = (0, 0, 255)
@@ -30,56 +24,84 @@ class TemperatureDisplay:
         """
         Initialise object using file_path for range (hot/cold) values
         """
-        self.__temp = None
         self._running = True
-        self.__sense = SenseHat()
-        self.__cold, self.__hot = self.load_config(file_path)
-        self.display_temperature()
+        self._sense = VirtualSenseHat.getSenseHat()
+        self._hot, self._cold = JSONLoader.load_config(file_path, self._sense)
 
-    @staticmethod
-    def load_config(file_path):
-        """
-        load range (hot/cold) values
-        :param file_path: path of config.json file
-        :return: hot/cold values
-        """
-        with open(file_path, "r") as fp:
-            data = json.load(fp)
-        return data["cold_max"], data["hot_min"]
+    # @staticmethod
+    # def load_config(file_path):
+    #     """
+    #     load range (hot/cold) values
+    #     :param file_path: path of config.json file
+    #     :return: hot/cold values
+    #     """
+    #     with open(file_path, "r") as fp:
+    #         data = json.load(fp)
+    #     return data["cold_max"], data["hot_min"]
 
     def run(self):
         """
-        TODO: sort out thread etc. maybe an easier way to do it. does it need to show constant? how to display constantly?
         :return:
         """
-        update_thread = Thread(target=self.run_update)
-        update_thread.start()
         while self._running:
-            self.display_temperature()
-            sleep(2)
-
-    def run_update(self):
-        while self._running:
-            self.update_temperature()
+            temp = self._sense.get_temperature()
+            self.display_temperature(temp)
             sleep(10)
 
     def terminate(self):
         self._running = False
 
-    def update_temperature(self):
-        self.__temp = self.__sense.get_temperature() + self.__adjustment
-
-    def display_temperature(self):
+    def display_temperature(self, temp):
         """
         Takes current temperature and displays in correct colour based on hot/cold range values
         NOTE: SenseHAT is consistently incorrect (overestimates temp), others have documented similar issues online
         Testing code in a SenseHAT emulator results in the correct output
         added self.__adjustment value to attempt to correct reading (wip)
-        :return:
+        :param temp: current temperature reading from CalibratedSenseHat [see get_temperature()]
+        :return: None
         """
-        if self.__temp is not None:
-            colour = self.blue if self.__temp <= self.__cold else (self.red if self.__temp >= self.__hot else self.green)
-            temp_msg = '{: .0f}C'.format(self.__temp)
-            self.__sense.show_message(temp_msg, text_colour=colour)
+        colour = self.blue if temp <= self._cold else (self.red if temp >= self._hot else self.green)
+        # if temp <= self._cold:
+        #     colour = self.blue
+        # elif temp >= self._hot:
+        #     colour = self.red
+        # else:
+        #     colour = self.green
+        self._sense.clear(colour)
+        # print temperature value to console for verification
+        print("{: .1f}C".format(temp))
+
+
+class JSONLoader:
+    @staticmethod
+    def load_config(file_path, sense):
+        """
+        attempts to load config.json file from
+        :param file_path: path of config.json file
+        :param sense: CalibratedSenseHat object for displaying error messages
+        :return: hot/cold values (if correct)
+        """
+        try:
+            with open(file_path, "r") as fp:
+                data = json.load(fp)
+            hot = data["cold_max"]
+            cold = data["hot_min"]
+            if hot < cold:
+                raise ValueError("Hot cannot be less than cold value")
+        except FileNotFoundError as fnfe:
+            message = "Could not find {}\n".format(file_path)
+            sense.show_message(message)
+            print("{}\n{}".format(message, str(fnfe)))
+            sys.exit()
+        except KeyError as ke:
+            message = "Error in accessing range values in {}\n".format(file_path)
+            sense.show_message(message)
+            print("{}\n{}".format(message, str(ke)))
+            sys.exit()
+        except ValueError as ve:
+            message = "Error in range values:\n{}".format(ve)
+            sense.show_message(message)
+            print("{}\n{}".format(message, str(ve)))
+            sys.exit()
         else:
-            self.__sense.show_message("Loading temp...")
+            return hot, cold
