@@ -78,21 +78,11 @@ class JSONLoader:
             cold = data["cold_max"]
             hot = data["hot_min"]
             if hot < cold:
-                raise ValueError("Hot cannot be less than cold value")
-        except FileNotFoundError as fnfe:
-            message = "Could not find {}\n".format(file_path)
+                raise ValueError("Error in range values: hot = {} cold = {}".format(hot, cold))
+        except (FileNotFoundError, KeyError, ValueError) as e:
+            message = str(e)
             sense.show_message(message)
-            print("{}\n{}".format(message, str(fnfe)))
-            sys.exit()
-        except KeyError as ke:
-            message = "Error in accessing range values in {}\n".format(file_path)
-            sense.show_message(message)
-            print("{}\n{}".format(message, str(ke)))
-            sys.exit()
-        except ValueError as ve:
-            message = "Error in range values:\n{}".format(ve)
-            sense.show_message(message)
-            print("{}\n{}".format(message, str(ve)))
+            print(message)
             sys.exit()
         else:
             return hot, cold
