@@ -85,12 +85,12 @@ class JSONLoader:
                 p_min = min(patterns[i]) if p_min > min(patterns[i]) else p_min
                 p_max = max(patterns[i]) if p_max < max(patterns[i]) else p_max
             if p_min < 0:
-                raise ValueError("Error in {}. patterns contain values < 0", file_name)
+                raise ValueError("error in {}: patterns contain values < 0".format(file_name))
             elif p_max >= len(colours):
-                raise ValueError("Error in {}. patterns exceed colour range", file_name)
+                raise ValueError("error in {}: patterns exceed colour range".format(file_name))
             else:
                 coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
-        except FileNotFoundError or KeyError or IndexError or ValueError as e:
+        except (FileNotFoundError, KeyError, IndexError, ValueError) as e:
             if sense is not None:
                 sense.show_message("Error in loading json file", scroll_speed=0.04)
             print(str(e))
