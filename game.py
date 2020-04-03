@@ -9,6 +9,7 @@ import sys
 class Game:
     def __init__(self, names: list, file_path: str):
         try:
+            # Check if the players list is empty
             if len(names) <= 0:
                 raise ValueError("Cannot run game with 0 players.")
         except ValueError as ve:
@@ -25,17 +26,22 @@ class Game:
     # Run the game
     def run(self):
         curr_player = 1
+        # Display init game instruction
         self.display_message(init=True)
         while True:
+            # Loop through players list and record their score
             player = self.players.get(curr_player)
             self.display_message(index=curr_player, name=player.name)
             player.update_score(self.dice.roll())
+            # If player score is greater than max score then start end game protocol
             if player.score >= self.max_score:
                 self.write_winner(player)
                 self.display_message(win=True, index=curr_player, name=player.name)
                 break
+            # iterate to next player in player list
             curr_player = 1 if curr_player == self.max_players else curr_player + 1
 
+    # Display appropriate messages through out a game
     def display_message(self, win=False, index=None, name=None, init=False):
         if init:
             message = "Players take turns rolling the dice, the first to get {} points wins the game".format(
