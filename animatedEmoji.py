@@ -13,7 +13,6 @@ class EmojiDisplay:
     def create_shapes():
         """
         hard coded pattern creation function, used as a fallback if json file is not specified
-        can specify a file path for config.json
         :return:
         """
         olive = (0, 143, 0)
@@ -65,6 +64,9 @@ class EmojiDisplay:
 
 
 class JSONLoader:
+    colour_max = 255
+    colour_index = 3
+
     @staticmethod
     def load_from_json(file_name, sense=None):
         """
@@ -73,6 +75,7 @@ class JSONLoader:
             e.g. pattern values are within range of colours
         :param file_name: config.json file to load from
         :param sense: SenseHat for optional error message display
+        :raise FileNotFoundError
         :return:
         """
         try:
@@ -80,14 +83,19 @@ class JSONLoader:
                 config = json.load(fp)
             colours = config["colours"]
             patterns = config["patterns"]
-            p_min, p_max = 0, 0
-            for i in range(0, len(patterns)):
-                p_min = min(patterns[i]) if p_min > min(patterns[i]) else p_min
-                p_max = max(patterns[i]) if p_max < max(patterns[i]) else p_max
+            p_min, p_max, _ = JSONLoader.get_range(patterns)
+            c_min, c_max, c_len = JSONLoader.get_range(colours)
             if p_min < 0:
                 raise ValueError("error in {}: patterns contain values < 0".format(file_name))
             elif p_max >= len(colours):
                 raise ValueError("error in {}: patterns exceed colour range".format(file_name))
+            elif c_min < 0:
+                raise ValueError("error in {}: colours contain values < 0".format(file_name))
+            elif c_max > JSONLoader.colour_max:
+                raise ValueError("error in {}: colours exceed max value of {}".format(file_name, JSONLoader.colour_max))
+            elif c_len > JSONLoader.colour_index:
+                raise ValueError("error in {}: colours exceed max number of values {}"
+                                 .format(file_name, JSONLoader.colour_index))
             else:
                 coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
         except (FileNotFoundError, KeyError, IndexError, ValueError) as e:
@@ -97,3 +105,12 @@ class JSONLoader:
             sys.exit()
         else:
             return coloured_patterns
+
+    @staticmethod
+    def get_range(arr: list):
+        a_min, a_max, a_len = 0, 0, 0
+        for i in range(0, len(arr)):
+            a_min = min(arr[i]) if a_min > min(arr[i]) else a_min
+            a_max = max(arr[i]) if a_max < max(arr[i]) else a_max
+            a_len = len(arr[i]) if a_len < len(arr[i]) else a_len
+        return a_min, a_max, a_len
