@@ -35,7 +35,7 @@ class TemperatureDisplay(AbstractDisplay):
             temp = self._sense.get_temperature()
             self.display_temperature(temp)
             sleep(10)
-
+        self._sense.clear()
 
     def display_temperature(self, temp):
         """
@@ -60,6 +60,7 @@ class JSONLoader:
     where x < y
     - only two range values are required i.e. comfortable range can be assumed from maximum of cold and minimum of hot
     """
+
     @staticmethod
     def load_config(file_path, sense):
         """
