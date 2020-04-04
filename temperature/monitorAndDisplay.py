@@ -1,4 +1,4 @@
-from virtual_sense_hat import VirtualSenseHat
+from temperature.virtual_sense_hat import VirtualSenseHat
 from time import sleep
 import sys
 import json

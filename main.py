@@ -3,12 +3,12 @@ Main/driver class to run/halt program
 """
 
 from threading import Thread
-from monitorAndDisplay import TemperatureDisplay
+from temperature.monitorAndDisplay import TemperatureDisplay
 from sense_hat import SenseHat, ACTION_PRESSED
 
 
 def run_program():
-    display = TemperatureDisplay("config.json")
+    display = TemperatureDisplay("temperature/config.json")
     display_thread = Thread(target=display.run)
     display_thread.start()
 

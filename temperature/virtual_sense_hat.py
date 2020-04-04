@@ -3,7 +3,7 @@
 
 import logging
 import random
-from sensehat_calibration import CalibratedSenseHat
+from temperature.sensehat_calibration import CalibratedSenseHat
 
 
 # noinspection PyMethodMayBeStatic
