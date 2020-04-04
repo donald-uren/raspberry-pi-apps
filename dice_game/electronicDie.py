@@ -2,6 +2,7 @@ from sense_hat import SenseHat
 from time import sleep
 import random
 
+
 # Dice object
 class ElectronicDice:
     x = (255, 255, 255)
@@ -74,19 +75,19 @@ class ElectronicDice:
         self.__sense = SenseHat()
 
     # Call the dice to roll
-    def roll(self):        
+    def roll(self):
         while True:
             acceleration = self.__sense.get_accelerometer_raw()
             x = acceleration['x']
             y = acceleration['y']
             z = acceleration['z']
-            
+
             x = abs(x)
             y = abs(y)
             z = abs(z)
-            
-            # Check if the sense_hat is being shake
-            if (x > 2 or y > 2 or z > 2):
+
+            # Check if the sense_hat is being shaked
+            if 2 in (x, y, z):
                 for i in range(3):
                     self.__sense.set_pixels(random.choice(self.sides))
                     sleep(0.5)
@@ -98,5 +99,3 @@ class ElectronicDice:
                 return self.sides.index(result) + 1
             else:
                 self.__sense.clear()
-               
-

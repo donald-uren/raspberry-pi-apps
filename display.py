@@ -5,12 +5,14 @@ class AbstractDisplay(ABC):
     """
     Simple abstract class for use in Task A & B
     """
+    err_colour = [255, 0, 0]
 
     def __init__(self):
         """
         Sets up initial loop condition. While True, the application will continue to run
         """
         self._running = True
+        # used to display errors on sense_hat in red
 
     @abstractmethod
     def run(self):

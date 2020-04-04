@@ -11,7 +11,7 @@ def process_input():
     interprets the command line input, running either TemperatureDisplay or EmojiDisplay
     For Temperature display, verifies that config file is .json format as per requirements
     (the config file is an optional argument for EmojiDisplay)
-    :return:
+    :return: void
     """
     sense = SenseHat()
     try:

@@ -16,6 +16,18 @@ class EmojiDisplay(AbstractDisplay):
         self.__sense = SenseHat()
         self._patterns = EmojiDisplay.create_shapes() if file_name is None else JSONLoader.load_from_json(file_name)
 
+    def run(self):
+        """
+        iterates through emoji list and displays on SenseHat (until joystick is pressed)
+        overrides run() in AbstractDisplay (see display.py)
+        :return: void
+        """
+        while self._running:
+            for emoji in self._patterns:
+                self.__sense.set_pixels(emoji)
+                sleep(3)
+        self.__sense.clear()
+
     @staticmethod
     def create_shapes():
         """
@@ -64,18 +76,6 @@ class EmojiDisplay(AbstractDisplay):
         ]
         return patterns
 
-    def run(self):
-        """
-        iterates through emoji list and displays on SenseHat (until joystick is pressed)
-        overrides run() in AbstractDisplay (see display.py)
-        :return: void
-        """
-        while self._running:
-            for emoji in self._patterns:
-                self.__sense.set_pixels(emoji)
-                sleep(3)
-        self.__sense.clear()
-
 
 class JSONLoader:
     """
@@ -118,7 +118,8 @@ class JSONLoader:
                 coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
         except (FileNotFoundError, KeyError, IndexError, ValueError) as e:
             if sense is not None:
-                sense.show_message("Error in loading json file: {}".format(file_name), scroll_speed=0.04)
+                sense.show_message("Error in loading json file: {}".format(file_name), scroll_speed=0.04,
+                                   back_colour=AbstractDisplay.err_colour)
             print(str(e))
             sys.exit()
         else:

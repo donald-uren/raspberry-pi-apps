@@ -29,7 +29,8 @@ class TemperatureDisplay(AbstractDisplay):
 
     def run(self):
         """
-        Records current temperature and runs temperature display
+        Records current temperature and runs temperature display (until joystick pressed)
+        :return: void
         """
         while self._running:
             temp = self._sense.get_temperature()
@@ -41,10 +42,11 @@ class TemperatureDisplay(AbstractDisplay):
         """
         Takes current temperature and displays in correct colour based on hot/cold range values.
 
-        NOTE: the SenseHat I've been working with doesn't detect the correct temperature. I've applied and modified
+        NOTE: the SenseHat I've been working with doesn't detect the correct temperature. I've applied (and modified)
         the calibration code from PIOT_LECTURE4_CODEARCHIVE however it's still off by roughly 2C.
 
         :param temp: current temperature reading from CalibratedSenseHat [see CalibratedSenseHat.get_temperature()]
+        :return: void
         """
         colour = self.blue if temp <= self._cold else (self.red if temp >= self._hot else self.green)
         self._sense.clear(colour)
@@ -78,7 +80,7 @@ class JSONLoader:
                 raise ValueError("Error in range values: hot = {} cold = {}".format(hot, cold))
         except (FileNotFoundError, KeyError, ValueError) as e:
             message = str(e)
-            sense.show_message(message)
+            sense.show_message(message, back_colour=AbstractDisplay.err_colour)
             print(message)
             sys.exit()
         else:
