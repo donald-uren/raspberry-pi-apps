@@ -1,7 +1,7 @@
 # RMIT IoT Sem1 2020 - Assignment 1
 
 ## Overview
-The project has 3 sub-tasks, as listed below. Task 1 and 2 utilise the same main.py file which monitors for a joystick press to halt the program.
+The project has 3 sub-tasks, as listed below. Task 1 and 2 utilise the same control file ([main.py](https://github.com/donald-uren/a1_iot/blob/master/main.py)) which monitors for a joystick press in order to halt the program.
 
 ## Tasks
 1. [Emoji display](https://github.com/donald-uren/a1_iot/tree/master/emoji):
