@@ -1,16 +1,18 @@
 from temperature.virtual_sense_hat import VirtualSenseHat
+from display import AbstractDisplay
 from time import sleep
 import sys
 import json
 
 
-class TemperatureDisplay:
+class TemperatureDisplay(AbstractDisplay):
     """
     Displays and monitors current temperature:
     - updates every 10s
     - display blue if <= cold_max
     - display red if >= hot_min
     - else display green
+    overrides run() from abstract class Application - refer to display.py for details
     """
     red = (255, 0, 0)
     green = (0, 255, 0)
@@ -21,7 +23,7 @@ class TemperatureDisplay:
         Initialise object, loads range values from configuration, and SenseHat (if available)
         :param file_path: config.json file path
         """
-        self._running = True
+        super().__init__()
         self._sense = VirtualSenseHat.getSenseHat()
         self._hot, self._cold = JSONLoader.load_config(file_path, self._sense)
 
@@ -34,12 +36,6 @@ class TemperatureDisplay:
             self.display_temperature(temp)
             sleep(10)
 
-    def terminate(self):
-        """
-        Terminates programming by setting loop condition to false and clearing the display
-        """
-        self._sense.clear()
-        self._running = False
 
     def display_temperature(self, temp):
         """

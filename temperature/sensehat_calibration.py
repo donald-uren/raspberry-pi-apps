@@ -18,7 +18,7 @@ class CalibratedSenseHat(SenseHat):
     def get_temperature(self):
         """
         Overrides SenseHat.get_temperature(), adding in calibration/correction for CPU temperature
-        :return:
+        :return: void
         """
         temp_cpu = get_cpu_temp()
         # Calculates the real temperature compensating CPU heating.

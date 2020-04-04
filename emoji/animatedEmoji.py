@@ -1,21 +1,27 @@
 import json
 import sys
+from typing import List
 from sense_hat import SenseHat
 from time import sleep
-from application import Application
+from display import AbstractDisplay
 
 
-class EmojiDisplay(Application):
+class EmojiDisplay(AbstractDisplay):
+    """
+    Class for housing and displaying a collection of emojis
+    overrides run() from abstract class Application - refer to display.py for details
+    """
     def __init__(self, file_name=None):
+        super().__init__()
         self.__sense = SenseHat()
         self._patterns = EmojiDisplay.create_shapes() if file_name is None else JSONLoader.load_from_json(file_name)
-        self._running = True
 
     @staticmethod
     def create_shapes():
         """
         hard coded pattern creation function, used as a fallback if json file is not specified
-        :return:
+        see JSONLoader.load_from_json() for dynamic version
+        :return: patterns list
         """
         olive = (0, 143, 0)
         pale = (255, 252, 121)
@@ -59,17 +65,23 @@ class EmojiDisplay(Application):
         return patterns
 
     def run(self):
+        """
+        iterates through emoji list and displays on SenseHat (until joystick is pressed)
+        overrides run() in AbstractDisplay (see display.py)
+        :return: void
+        """
         while self._running:
             for emoji in self._patterns:
                 self.__sense.set_pixels(emoji)
                 sleep(3)
         self.__sense.clear()
 
-    def terminate(self):
-        self._running = False
-
 
 class JSONLoader:
+    """
+    simple class to house json loading/parsing, and creation of a patterns list
+    a patterns list is a list of lists, each containing RGB values for displaying an emoji
+    """
     colour_max = 255
     colour_index = 3
 
@@ -82,7 +94,7 @@ class JSONLoader:
         :param file_name: config.json file to load from
         :param sense: SenseHat for optional error message display
         :raise FileNotFoundError
-        :return:
+        :return: void
         """
         try:
             with open(file_name, "r") as fp:
@@ -106,14 +118,20 @@ class JSONLoader:
                 coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
         except (FileNotFoundError, KeyError, IndexError, ValueError) as e:
             if sense is not None:
-                sense.show_message("Error in loading json file", scroll_speed=0.04)
+                sense.show_message("Error in loading json file: {}".format(file_name), scroll_speed=0.04)
             print(str(e))
             sys.exit()
         else:
             return coloured_patterns
 
     @staticmethod
-    def get_range(arr: list):
+    def get_range(arr: List[List[int]]):
+        """
+        utility method to find the min-item/max-item/max_length from a list of lists
+        items are numeric values
+        :param arr: a list of lists
+        :returns: minimum value from any list, max value from any list, and max length of any list
+        """
         a_min, a_max, a_len = 0, 0, 0
         for i in range(0, len(arr)):
             a_min = min(arr[i]) if a_min > min(arr[i]) else a_min
