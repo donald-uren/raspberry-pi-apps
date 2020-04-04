@@ -24,7 +24,7 @@ python3 main.py [emoji|temperature] [config.json]
 
 Task 3 can be run using:
 ```
-python3 dice_game/main.py
+python3 game.py
 ```
 
 ## Contributors
