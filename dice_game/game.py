@@ -1,4 +1,4 @@
-from dice_game.electronicDie import ElectronicDice
+from electronicDie import ElectronicDice
 from datetime import datetime
 from sense_hat import SenseHat
 import csv
