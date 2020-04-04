@@ -2,9 +2,10 @@ import json
 import sys
 from sense_hat import SenseHat
 from time import sleep
+from application import Application
 
 
-class EmojiDisplay:
+class EmojiDisplay(Application):
     def __init__(self, file_name=None):
         self.__sense = SenseHat()
         self._patterns = EmojiDisplay.create_shapes() if file_name is None else JSONLoader.load_from_json(file_name)
@@ -57,7 +58,7 @@ class EmojiDisplay:
         ]
         return patterns
 
-    def display_emoji(self):
+    def run(self):
         while self._running:
             for emoji in self._patterns:
                 self.__sense.set_pixels(emoji)
