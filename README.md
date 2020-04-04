@@ -10,7 +10,7 @@ A simple program which displays a series of emoji faces.
 2. [Temperature display](https://github.com/donald-uren/a1_iot/tree/master/temperature):
 A simple program which detects and displays the current temperature as a solid colour based on customisable range values.
 
-3. [Electronic dice game](https://github.com/donald-uren/a1_iot/tree/mater/dice_game):
+3. [Electronic dice game](https://github.com/donald-uren/a1_iot/tree/master/dice_game):
 A 2-player dice game, 2 players take turn shaking the raspberry as it simulate the act of rolling the dice. Who gets 30 points first win the game which will then stop and export winner name and score to a csv file.
 
 ## Requirements
