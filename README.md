@@ -18,14 +18,14 @@ Tasks have been tested and implemented on Raspberry Pi 3 Model B with SenseHAT, 
 
 ### How to run:
 Tasks 1 and 2 can be run using:
-'''
+```
 python3 main.py [emoji|temperature] [config.json]
-'''
+```
 
 Task 3 can be run using:
-'''
+```
 python3 dice_game/main.py
-'''
+```
 
 ## Contributors
 1. [Donald U'Ren](https://github.com/donald-uren)
