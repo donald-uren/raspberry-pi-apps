@@ -8,14 +8,17 @@ import sys
 def process_input():
     sense = SenseHat()
     if len(sys.argv) <= 1:
-        sense.show_message("Incorrect args: {}\nexpected main.py [emoji|temperature] filepath")
+        sense.show_message("Incorrect args: {}\nexpected main.py [emoji|temperature] filepath".format(" ".join(sys.argv)))
     else:
         app = sys.argv[1]
-        config = sys.argv[3] if len(sys.argv) > 2 else None
-        if app is "emoji":
+        config = sys.argv[2] if len(sys.argv) > 2 else None
+        print(app == "emoji")
+        if app == "emoji":
+            display = EmojiDisplay(config)
+        elif app == "temperature":
+            sense.show_message("temp")
             display = EmojiDisplay(config)
         else:
-            sense.show_message("temp")
             display = EmojiDisplay(config)
         run_program(display, sense)
 
