@@ -1,4 +1,4 @@
-from animatedEmoji import EmojiDisplay
+from emoji.animatedEmoji import EmojiDisplay
 from threading import Thread
 from sense_hat import SenseHat, ACTION_PRESSED
 from application import Application
@@ -8,7 +8,8 @@ import sys
 def process_input():
     sense = SenseHat()
     if len(sys.argv) <= 1:
-        sense.show_message("Incorrect args: {}\nexpected main.py [emoji|temperature] filepath".format(" ".join(sys.argv)))
+        sense.show_message(
+            "Incorrect args: {}\nexpected main.py [emoji|temperature] filepath".format(" ".join(sys.argv)))
     else:
         app = sys.argv[1]
         config = sys.argv[2] if len(sys.argv) > 2 else None
