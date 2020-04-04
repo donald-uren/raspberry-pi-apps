@@ -8,6 +8,8 @@ class EmojiDisplay:
     def __init__(self, file_name=None):
         self.__sense = SenseHat()
         self._patterns = EmojiDisplay.create_shapes() if file_name is None else JSONLoader.load_from_json(file_name)
+        self._current_emoji = 0
+        self._running = True
 
     @staticmethod
     def create_shapes():
@@ -57,10 +59,14 @@ class EmojiDisplay:
         return patterns
 
     def display_emoji(self):
-        for emoji in self._patterns:
-            self.__sense.set_pixels(emoji)
-            sleep(3)
+        while self._running:
+            for emoji in self._patterns:
+                self.__sense.set_pixels(emoji)
+                sleep(3)
         self.__sense.clear()
+
+    def terminate(self):
+        self._running = False
 
 
 class JSONLoader:
