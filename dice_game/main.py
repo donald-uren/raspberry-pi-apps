@@ -1,4 +1,4 @@
-from game import Game
+from dice_game.game import Game
 
 # Start a game with 2 parameters:
 # A list of players and.
