@@ -87,7 +87,7 @@ class ElectronicDice:
             z = abs(z)
 
             # Check if the sense_hat is being shaked
-            if 2 in (x, y, z):
+            if x > 2 or y > 2 or z > 2:
                 for i in range(3):
                     self.__sense.set_pixels(random.choice(self.sides))
                     sleep(0.5)
@@ -99,3 +99,4 @@ class ElectronicDice:
                 return self.sides.index(result) + 1
             else:
                 self.__sense.clear()
+

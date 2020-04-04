@@ -1,4 +1,4 @@
-from dice_game.electronicDie import ElectronicDice
+from electronicDie import ElectronicDice
 from datetime import datetime
 from sense_hat import SenseHat
 import csv
@@ -108,3 +108,12 @@ class Game:
 
         def __str__(self):
             return "{}'s score: {}".format(self.name, self.score)
+
+
+"""
+Start a game with 2 parameters:
+    - A list of players and.
+    - A csv file name to export the result to
+"""
+game = Game(["John", "Mike"], "winner.csv")
+game.run()
