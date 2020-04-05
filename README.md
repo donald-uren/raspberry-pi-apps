@@ -10,7 +10,7 @@ A simple program which displays a series of emoji faces. Can also optionally loa
 2. [Temperature display](https://github.com/donald-uren/a1_iot/tree/master/temperature):
 A simple program which detects and displays the current temperature as a solid colour based on customisable range values (loaded from a .json file)
 
-3. [Electronic dice game](https://github.com/donald-uren/a1_iot/tree/master):
+3. [Electronic dice game](https://github.com/donald-uren/a1_iot/tree/master/dice):
 A multi-player dice game, where players take turns shaking the raspberry to simulate the act of rolling dice. Whoever gets 30 points first wins the game, which will then export winner name and score to a .csv file.
 
 ## Requirements
@@ -24,8 +24,9 @@ python3 main.py [emoji|temperature] [config.json]
 
 Task 3 can be run using:
 ```
-python3 game.py
+python3 dice/game.py
 ```
+the winner will be written to dice/winner.csv
 
 ## Contributors
 1. [Donald U'Ren](https://github.com/donald-uren)
