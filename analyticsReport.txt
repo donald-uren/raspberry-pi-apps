@@ -1,0 +1,100 @@
+﻿NOTE: for detailed notes on each function please view the comments in code. Most/all are clearly annotated.
+
+
+Task 1: Emoji Display
+
+
+animatedEmoji.py
+This file contains the EmojiDisplay Class, which handles displaying and iterating through the emoji list. It also contains the JSONLoader class which handles optional loading of patterns from file.
+
+
+* EmojiDisplay inherits two methods from the abstract class AbstractDisplay
+   * Abstract method run() is implemented to run the program (while the loop condition is met: that the user has not pressed the joystick)
+   * terminate() is inherited, and simply sets the loop condition to false
+* Optionally, if a json file is specified at runtime, patterns can be loaded from that file (see below for format specifications). Otherwise a hard-coded option is used as a fallback.
+* This is done using JSONLoader class: checks for errors such as RGB values having > 3 items, pattern lengths exceeding 64 pixels, and indexes in the list of colours provided. See comments in code for further details on exception handling.
+
+
+config.json
+This file consists of a list of RGB colour values, and a list of patterns containing integer indexes which correspond to the RGB colour values listed:
+
+
+{
+        Colours: [
+                [0, 255, 0],
+                …
+        ],
+        “Patterns”: [
+                [0, 1, 1, …],
+                ...
+        ]
+}
+
+
+
+
+Task 2: Temperature Display
+
+
+monitorAndDisplay.py
+This file contains the TemperatureDisplay class, which like EmojiDisplay inherits from abstract class AbstractDisplay. TemperatureDisplay handles the displaying of temperature data.
+* run() is overridden from AbstractDisplay to loop temperature while condition is met (i.e. joystick is not pressed)
+* terminate() is inherited from AbstractDisplay - sets condition to false
+* JSONLoader extracts range from json file:
+   * We only used a cold_max and hot_min range, as these can be used to define comfortable as anything between these two values (i.e. comfortable range values inside the config were redundant)
+* This class also ensures that the cold_max value is not greater than hot_min, and raises exceptions if the keys (cold_max, hot_min) are not found, or if file is not found.
+
+
+sensehat_calibration.py
+Modified code from the lectures. Includes class CalibratedSenseHat, which overrides get_temperature() from SenseHat to add in the calibration functionality:
+* get_temperature() takes the cpu temperature, average of temperature from pressure and humidity, and then calculates the real temperature (i.e. compensating for the cpu temperature)
+* NOTE: the SenseHat we worked with still records room temperature incorrectly, despite out best efforts to calibrate it. It is still off by roughly 2C, but is far more accurate with the calibration code.
+
+
+virtual_sense_hat.py
+Code from tutorial/lecture material. Only slight modification is that if a sense_hat is found it returns a CalibratedSenseHat object.
+
+
+config.json
+Contains the range values. As noted, comfortable range values aren’t really needed as these can be inferred from the maximum allowable cold value and the minimum allowable hot value. Expected keys are cold_max and hot_min
+
+
+
+
+Task 3: Electronic Dice
+
+
+electronicDice.py: 
+This file contains the “electronicDice” object which can be imported and used in a dice game.
+
+
+* The electronic dice object has six sides and each side has its own design. The dice object has a “roll()” method which can be called to roll the dice. 
+
+
+* When the roll function is called, the sense-hat will be waiting until it is shaken (which can be detected when the acceleration values are greater than two then it will randomly generate and display three sides on the sense-hat LED matrix simulating a rolling dice before stoping and display a final side. The roll method returns the score value of that final side.
+
+
+game.py: 
+This file contains the “Game” object and the “Player” object. 
+
+
+* A “Player” object has a “name” and a “score” which is how many scores this play has. This object also has a “update_score()” function to update the player score and a “__str__()” method returning player score in a standard format.
+
+
+* A “Game” object starts when “run()” function is called. It will then display the initial instruction of the game for all of the players. It will then iterate through the player list (the player list need at least one player) and display the appropriate messages/roll the electronic dice and update player score. The loop breaks when a player reaches the maximum score. The game will then declare who the winner is and call “write_winner()” method to log winner’s name, score and a timestamp to a designated file.
+
+
+
+
+Misc: Other Files
+
+
+display.py
+Contains the AbstractDisplay class (used in Task 1 & 2). Contains a class variable err_colour for printing in red, an object variable _running which is the loop condition,  an abstract method run(), and implements terminate() which is a simple setter method for the loop condition.
+
+
+main.py
+Control file for running tasks 1 & 2. Takes either 1 or 2 arguments:
+        Python3 main.py [temperature|emoji] [config_file_path]
+* Arg1 is the program to run
+* Arg2 is an optional json.config file (optional for task1, required for task2)
