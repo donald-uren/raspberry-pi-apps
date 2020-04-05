@@ -46,11 +46,9 @@ def run_program(application: AbstractDisplay, sense: SenseHat):
     """
     display_thread = Thread(target=application.run)
     display_thread.start()
-
     running = True
     while running:
-        # get a list of joystick events from sense_hat
-        events = sense.stick.get_events()
+        events = sense.stick.get_events()  # get a list of joystick events from sense_hat
         for event in events:
             # halts program if any direction or click is pressed by user
             running = False if event.action == ACTION_PRESSED else True

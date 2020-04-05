@@ -11,6 +11,7 @@ class EmojiDisplay(AbstractDisplay):
     Class for housing and displaying a collection of emojis
     overrides run() from abstract class Application - refer to display.py for details
     """
+
     def __init__(self, file_name=None):
         super().__init__()
         self.__sense = SenseHat()
@@ -84,6 +85,7 @@ class JSONLoader:
     """
     colour_max = 255
     colour_index = 3
+    pixel_max = 64
 
     @staticmethod
     def load_from_json(file_name, sense=None):
@@ -101,25 +103,27 @@ class JSONLoader:
                 config = json.load(fp)
             colours = config["colours"]
             patterns = config["patterns"]
-            p_min, p_max, _ = JSONLoader.get_range(patterns)
+            p_min, p_max, p_len = JSONLoader.get_range(patterns)
             c_min, c_max, c_len = JSONLoader.get_range(colours)
-            if p_min < 0:
+            if p_min < 0:  # patterns contain a colour list index below 0
                 raise ValueError("error in {}: patterns contain values < 0".format(file_name))
-            elif p_max >= len(colours):
+            elif p_max >= len(colours):  # patterns contain index outside of colour list
                 raise ValueError("error in {}: patterns exceed colour range".format(file_name))
-            elif c_min < 0:
+            elif p_len > JSONLoader.pixel_max:  # patterns contain more than 64 pixels
+                raise ValueError("error in {}: patterns exceeded 64 pixels".format(file_name))
+            elif c_min < 0:  # colours contain RGB values below 0
                 raise ValueError("error in {}: colours contain values < 0".format(file_name))
-            elif c_max > JSONLoader.colour_max:
-                raise ValueError("error in {}: colours exceed max value of {}".format(file_name, JSONLoader.colour_max))
-            elif c_len > JSONLoader.colour_index:
+            elif c_max > JSONLoader.colour_max:  # colours contain RGB values greater than 255
+                raise ValueError("error in {}: colours exceed max value of {}"
+                                 .format(file_name, JSONLoader.colour_max))
+            elif c_len > JSONLoader.colour_index:  # colours contain more than just 3 values (i.e. not RGB)
                 raise ValueError("error in {}: colours exceed max number of values {}"
                                  .format(file_name, JSONLoader.colour_index))
-            else:
+            else:  # patterns/colours are verified - format patterns with corresponding RGB codes
                 coloured_patterns = [[colours[j] for j in patterns[i]] for i in range(0, len(patterns))]
         except (FileNotFoundError, KeyError, IndexError, ValueError) as e:
             if sense is not None:
-                sense.show_message("Error in loading json file: {}".format(file_name), scroll_speed=0.04,
-                                   back_colour=AbstractDisplay.err_colour)
+                sense.show_message(str(e), scroll_speed=0.04, back_colour=AbstractDisplay.err_colour)
             print(str(e))
             sys.exit()
         else:

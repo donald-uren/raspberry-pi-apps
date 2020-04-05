@@ -38,19 +38,18 @@ class Game:
         self.display_message(msg=self.max_score, init=True)
         while True:
             player = self.players.get(curr_player)
-            self.display_message(msg=player.name, index=curr_player)
+            self.display_message(msg=player.name, index=curr_player)  # display instructions: e.g. player 1's turn
             player.update_score(self.dice.roll())
             if player.score >= self.max_score:
                 self.write_winner(player)
                 self.display_message(msg=player.name, win=True, index=curr_player)
                 break
-            # set the current player to the first if the round has ended
             if curr_player == self.max_players:
-                scores = ", ".join([str(player) for player in self.players.values()])
-                scores_format = "Round {} scores: {}".format(round_count, scores)
+                scores = ", ".join([str(player) for player in self.players.values()])  # collate the players scores
+                scores_format = "Round {}: {}".format(round_count, scores)
                 self.display_message(msg=scores_format)
                 round_count += 1
-                curr_player = 1
+                curr_player = 1  # set the current player to player 1 (i.e. start a new round)
             else:
                 curr_player += 1
 
@@ -63,13 +62,13 @@ class Game:
         :param index: index of a player in dictionary self.players
         :return: void
         """
-        if init:
+        if init:  # start of game: display basic instructions
             message = "Players take turns rolling the dice, the first to get {} points wins the game".format(msg)
         elif win:
             message = "{} (player {}) wins!".format(msg, index)
-        elif index is not None:
+        elif index is not None:  # player index specified infers that it is player x's turn
             message = "{}'s roll (player {})".format(msg, index)
-        else:
+        else:  # any other cases: i.e. end of round scores
             message = msg
         print(message)
         self.sense.show_message(message, scroll_speed=0.04)
@@ -115,5 +114,5 @@ Start a game with 2 parameters:
     - A list of players and.
     - A csv file name to export the result to
 """
-game = Game(["John", "Mike"], "winner.csv")
+game = Game(["John", "Mike"], "../winner.csv")
 game.run()
